@@ -9,6 +9,7 @@ import Admin from './pages/Admin'
 import Clientes from './pages/Clientes'
 import Registro from './pages/Registro'
 import CuentaPendiente from './pages/CuentaPendiente'
+import Landing from './pages/Landing'
 
 export const AuthContext = createContext(null)
 
@@ -117,7 +118,8 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthContext.Provider>
