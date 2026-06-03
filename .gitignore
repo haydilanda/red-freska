@@ -1,0 +1,30 @@
+# ── Dependencias ─────────────────────────────────────────
+node_modules/
+dist/
+
+# ── Variables de entorno (NUNCA subir claves) ─────────────
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# ── Python ────────────────────────────────────────────────
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+*.pyc
+*.pyo
+
+# ── Sistema operativo ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editores ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+
+# ── Logs ──────────────────────────────────────────────────
+*.log
+npm-debug.log*
