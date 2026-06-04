@@ -2,29 +2,41 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/logo.png'
 
-// ── Imágenes ────────────────────────────────────────────────────────────────
-// Fotos de alta calidad (Unsplash, libres de uso)
-// Para reemplazar con tus fotos: guarda en src/assets/fotoX.jpg
-// y cambia la URL de Unsplash por: new URL('../assets/fotoX.jpg', import.meta.url).href
+// ── Imágenes — tus fotos reales ─────────────────────────────────────────────
+import _f1  from '../assets/foto1.jpg'
+import _f2  from '../assets/foto2.jpg'
+import _f3  from '../assets/foto3.jpg'
+import _f4  from '../assets/foto4.jpg'
+import _f5  from '../assets/foto5.jpg'
+import _f6  from '../assets/foto6.jpg'
+import _f7  from '../assets/foto7.jpg'
+import _f8  from '../assets/foto8.jpg'
+import _f9  from '../assets/foto9.jpg'
+import _f10 from '../assets/foto10.jpg'
+import _f11 from '../assets/foto11.jpg'
+import _f12 from '../assets/foto12.jpg'
+import _f13 from '../assets/foto13.jpg'
+import _f14 from '../assets/foto14.jpg'
+import _f15 from '../assets/foto15.jpg'
+import _f16 from '../assets/foto16.jpg'
+
 const IMGS = {
-  // Chica con comida viral — estilo lifestyle/tiktok
-  foto1: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=85&fit=crop',
-  // Café aesthetic con bebida — viral content
-  foto2: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=85&fit=crop',
-  // Galería / experiencia food cultural
-  foto3: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=85&fit=crop',
-  // Fast food / burger — brands como McDonald's
-  foto4: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=85&fit=crop',
-  // Pizza — retro diner aesthetic
-  foto5: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=85&fit=crop',
-  // Sushi / experiencia culinaria compartida
-  foto6: 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=85&fit=crop',
-  // Comida colorida con energia — cultura food
-  foto7: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=85&fit=crop',
-  // Café / bakery / momento lifestyle
-  foto8: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=85&fit=crop',
-  // Food aesthetic — identidad cultural
-  foto9: 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=800&q=85&fit=crop',
+  foto1: _f1,   // hero mosaico
+  foto2: _f2,   // hero mosaico
+  foto3: _f3,   // hero mosaico
+  foto4: _f4,   // el problema
+  foto5: _f5,   // cómo funciona — detectamos
+  foto6: _f6,   // cómo funciona — evaluamos
+  foto7: _f7,   // cómo funciona — accionamos
+  foto8: _f8,   // galería cultura
+  foto9: _f9,   // galería cultura
+  foto10: _f10, // galería cultura
+  foto11: _f11, // galería cultura
+  foto12: _f12, // galería cultura
+  foto13: _f13, // galería cultura
+  foto14: _f14, // contacto fondo
+  foto15: _f15, // extra
+  foto16: _f16, // extra
 }
 
 // Tendencias reales detectadas — el ticker las muestra en loop
@@ -329,15 +341,22 @@ export default function Landing() {
             <p className="text-gray-500 mt-3">Cada imagen es una tendencia. Cada tendencia, una oportunidad para tu marca.</p>
           </div>
 
-          {/* Mosaico asimétrico */}
+          {/* Mosaico con todas tus fotos */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="md:col-span-2 md:row-span-2">
-              <Img src={IMGS.foto9} className="w-full h-64 md:h-full object-cover rounded-3xl" fallback="#2d1b69" />
+              <Img src={IMGS.foto8} className="w-full h-64 md:h-full object-cover rounded-3xl" fallback="#2d1b69" />
             </div>
-            <Img src={IMGS.foto8} className="w-full h-40 object-cover rounded-3xl" fallback="#1a4e3f" />
-            <Img src={IMGS.foto2} className="w-full h-40 object-cover rounded-3xl" fallback="#4e1a3f" />
-            <Img src={IMGS.foto5} className="w-full h-40 object-cover rounded-3xl" fallback="#3f1a4e" />
-            <Img src={IMGS.foto6} className="w-full h-40 object-cover rounded-3xl" fallback="#1a3f4e" />
+            <Img src={IMGS.foto9}  className="w-full h-40 object-cover rounded-3xl" fallback="#1a4e3f" />
+            <Img src={IMGS.foto10} className="w-full h-40 object-cover rounded-3xl" fallback="#4e1a3f" />
+            <Img src={IMGS.foto11} className="w-full h-40 object-cover rounded-3xl" fallback="#3f1a4e" />
+            <Img src={IMGS.foto12} className="w-full h-40 object-cover rounded-3xl" fallback="#1a3f4e" />
+          </div>
+
+          {/* Segunda fila de fotos */}
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mt-3">
+            {[IMGS.foto13, IMGS.foto14, IMGS.foto15, IMGS.foto16, IMGS.foto4].map((src, i) => (
+              <Img key={i} src={src} className="w-full h-32 object-cover rounded-2xl" fallback="#1a1a2e" />
+            ))}
           </div>
         </div>
       </section>
