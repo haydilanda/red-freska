@@ -92,10 +92,14 @@ export default function Landing() {
     setEnviando(true)
     setErrorForm('')
     try {
-      const res = await fetch('https://formspree.io/f/xzzblqbd', {
+      const body = new URLSearchParams({
+        'form-name': 'contacto',
+        ...form,
+      })
+      const res = await fetch('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(form),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
       })
       if (res.ok) setEnviado(true)
       else setErrorForm('No se pudo enviar. Escríbenos a redfreska@gmail.com')

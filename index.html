@@ -4,9 +4,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>red-freska</title>
+    <title>Red Freska — Inteligencia cultural para marcas de food</title>
   </head>
   <body>
+    <!-- Netlify Forms: este form oculto hace que Netlify detecte el formulario de contacto -->
+    <form name="contacto" data-netlify="true" hidden>
+      <input name="nombre" />
+      <input name="empresa" />
+      <input name="email" type="email" />
+      <textarea name="mensaje"></textarea>
+    </form>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
