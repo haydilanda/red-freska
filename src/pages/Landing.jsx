@@ -3,18 +3,28 @@ import { Link } from 'react-router-dom'
 import logo from '../assets/logo.png'
 
 // ── Imágenes ────────────────────────────────────────────────────────────────
-// Guarda cada imagen en src/assets/ con el nombre indicado
-// Si una imagen no existe aún, esa sección queda con fondo de color
+// Fotos de alta calidad (Unsplash, libres de uso)
+// Para reemplazar con tus fotos: guarda en src/assets/fotoX.jpg
+// y cambia la URL de Unsplash por: new URL('../assets/fotoX.jpg', import.meta.url).href
 const IMGS = {
-  foto1: new URL('../assets/foto1.jpg', import.meta.url).href,
-  foto2: new URL('../assets/foto2.jpg', import.meta.url).href,
-  foto3: new URL('../assets/foto3.jpg', import.meta.url).href,
-  foto4: new URL('../assets/foto4.jpg', import.meta.url).href,
-  foto5: new URL('../assets/foto5.jpg', import.meta.url).href,
-  foto6: new URL('../assets/foto6.jpg', import.meta.url).href,
-  foto7: new URL('../assets/foto7.jpg', import.meta.url).href,
-  foto8: new URL('../assets/foto8.jpg', import.meta.url).href,
-  foto9: new URL('../assets/foto9.jpg', import.meta.url).href,
+  // Chica con comida viral — estilo lifestyle/tiktok
+  foto1: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=85&fit=crop',
+  // Café aesthetic con bebida — viral content
+  foto2: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=85&fit=crop',
+  // Galería / experiencia food cultural
+  foto3: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=85&fit=crop',
+  // Fast food / burger — brands como McDonald's
+  foto4: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=85&fit=crop',
+  // Pizza — retro diner aesthetic
+  foto5: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=85&fit=crop',
+  // Sushi / experiencia culinaria compartida
+  foto6: 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=85&fit=crop',
+  // Comida colorida con energia — cultura food
+  foto7: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=85&fit=crop',
+  // Café / bakery / momento lifestyle
+  foto8: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=85&fit=crop',
+  // Food aesthetic — identidad cultural
+  foto9: 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=800&q=85&fit=crop',
 }
 
 // Tendencias reales detectadas — el ticker las muestra en loop
