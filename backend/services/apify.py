@@ -296,6 +296,29 @@ def run_tiktok_scraper(api_key: str, max_videos: int = 80) -> List[dict]:
     return items
 
 
+def extraer_url_video(item: dict) -> str:
+    """Construye la URL de TikTok para un video."""
+    # Intentar URL directa primero
+    url = item.get("webVideoUrl") or item.get("url") or ""
+    if url and "tiktok.com" in url:
+        return url
+    # Construir desde author + id
+    video_id = item.get("id") or ""
+    author = item.get("authorMeta") or item.get("author") or {}
+    username = author.get("name") or author.get("uniqueId") or ""
+    if video_id and username:
+        return f"https://www.tiktok.com/@{username}/video/{video_id}"
+    return ""
+
+
+def extraer_thumbnail(item: dict) -> str:
+    """Extrae la URL de la miniatura del video."""
+    covers = item.get("covers") or item.get("videoMeta", {}).get("covers") or []
+    if covers:
+        return covers[0] if isinstance(covers[0], str) else ""
+    return item.get("thumbnailUrl") or item.get("originCoverUrl") or ""
+
+
 def formatear_para_claude(items: List[dict], top_n: int = 60) -> str:
     """
     Capa 2 del embudo + formateo enriquecido para Claude.
@@ -350,10 +373,38 @@ def formatear_para_claude(items: List[dict], top_n: int = 60) -> str:
             origen_str = " | 🌱 orgánico"
 
         lineas.append(
-            f"{i}. [{plays:,} views · {likes:,} likes · {comments:,} cmts · {shares:,} shares]"
+            f"[VIDEO_{i}] [{plays:,} views · {likes:,} likes · {comments:,} cmts · {shares:,} shares]"
             f" [{fecha_str}] [{tier}]{origen_str}{sound_str}\n"
             f"   {desc}\n"
             f"   {hashtags}"
         )
 
     return "\n\n".join(lineas)
+
+
+def obtener_videos_por_indices(items: List[dict], indices: List[int], top_n: int = 60) -> List[dict]:
+    """
+    Dado una lista de índices (1-based) retornados por Claude,
+    devuelve los datos de esos videos para guardarlos como referencia.
+    """
+    items_limpios = _prefiltrar(items)
+    items_ordenados = sorted(items_limpios, key=_engagement_score, reverse=True)[:top_n]
+
+    resultado = []
+    for idx in indices:
+        i = idx - 1  # convertir a 0-based
+        if 0 <= i < len(items_ordenados):
+            item = items_ordenados[i]
+            stats = item.get("stats") or {}
+            plays = item.get("playCount") or stats.get("playCount", 0) or 0
+            desc  = (item.get("text") or item.get("desc") or "")[:150]
+            url   = extraer_url_video(item)
+            thumb = extraer_thumbnail(item)
+            if url:
+                resultado.append({
+                    "url":         url,
+                    "thumbnail":   thumb,
+                    "descripcion": desc,
+                    "views":       plays,
+                })
+    return resultado[:5]  # máximo 5 videos por tendencia

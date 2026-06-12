@@ -432,6 +432,66 @@ export default function DetalleTendencia() {
             <p className="text-sm text-gray-600 leading-relaxed">{tendencia.descripcion}</p>
           </div>
 
+          {/* Videos de referencia */}
+          {tendencia.videos_referencia?.length > 0 && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-gray-700">Videos que originaron esta tendencia</h3>
+                <span className="text-xs text-gray-400">{tendencia.videos_referencia.length} videos de referencia</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {tendencia.videos_referencia.map((video, i) => (
+                  <a
+                    key={i}
+                    href={video.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative rounded-xl overflow-hidden border border-gray-100 hover:border-black transition-all hover:shadow-md"
+                  >
+                    {/* Thumbnail */}
+                    <div className="aspect-[9/16] bg-gray-100 relative overflow-hidden">
+                      {video.thumbnail ? (
+                        <img
+                          src={video.thumbnail}
+                          alt={`Video ${i + 1}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-900">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="white" className="opacity-60">
+                            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/>
+                          </svg>
+                        </div>
+                      )}
+                      {/* Overlay con views */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1.5">
+                        <p className="text-white text-xs font-semibold">
+                          {video.views >= 1_000_000
+                            ? `${(video.views / 1_000_000).toFixed(1)}M`
+                            : video.views >= 1_000
+                              ? `${(video.views / 1_000).toFixed(0)}K`
+                              : video.views} views
+                        </p>
+                      </div>
+                      {/* Ícono play */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                          <ExternalLink size={16} className="text-white" />
+                        </div>
+                      </div>
+                    </div>
+                    {/* Descripción */}
+                    <div className="p-2">
+                      <p className="text-xs text-gray-500 leading-tight line-clamp-2">
+                        {video.descripcion || 'Ver en TikTok'}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Brief */}
           {score?.brief ? (
             <div>

@@ -62,6 +62,8 @@ CAMPOS REQUERIDOS por tendencia:
     3 = conexión moderada, requiere ángulo creativo
     1 = conexión forzada, solo marcas muy arriesgadas podrían usarla
 - fecha: fecha de hoy en formato YYYY-MM-DD
+- video_indices: lista de 2 a 5 números enteros indicando qué videos (por su número [VIDEO_N])
+  son los más representativos de esta tendencia. Ej: [3, 7, 12]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -78,7 +80,8 @@ Responde SOLO con JSON válido, sin texto extra:
       "descripcion": "...",
       "momentum": "emergente|pico|establecida",
       "relevancia_food": 1-5,
-      "fecha": "YYYY-MM-DD"
+      "fecha": "YYYY-MM-DD",
+      "video_indices": [1, 4, 9]
     }
   ]
 }"""

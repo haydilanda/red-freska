@@ -89,6 +89,7 @@ class Tendencia(TendenciaBase):
     estado: str = "revisar"
     momentum: Optional[str] = None          # "emergente" | "pico" | "establecida"
     relevancia_food: Optional[int] = None   # 1-5
+    videos_referencia: Optional[List[Any]] = None  # [{url, thumbnail, descripcion, views}]
     creada_at: Optional[datetime]
 
     class Config:

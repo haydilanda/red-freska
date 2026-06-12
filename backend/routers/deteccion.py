@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from supabase import create_client
 from routers.auth import get_current_user
-from services.apify import run_tiktok_scraper, run_tiktok_ads_scraper, formatear_para_claude
+from services.apify import run_tiktok_scraper, run_tiktok_ads_scraper, formatear_para_claude, obtener_videos_por_indices
 from concurrent.futures import ThreadPoolExecutor
 from services.trend_detector import detectar_tendencias
 from services.scoring import calcular_score
@@ -97,7 +97,13 @@ def _run_deteccion():
         for t in tendencias:
             if t["nombre"] not in existentes_map:
                 fila = {k: v for k, v in t.items() if k in CAMPOS_TENDENCIA}
-                fila["estado"] = "revisar"   # siempre entra en revisión, no publicada directamente
+                fila["estado"] = "revisar"
+                # Guardar videos de referencia usando los índices que Claude indicó
+                video_indices = t.get("video_indices") or []
+                if video_indices and items:
+                    fila["videos_referencia"] = obtener_videos_por_indices(items, video_indices)
+                else:
+                    fila["videos_referencia"] = []
                 nuevas.append(fila)
 
         insertadas = []
