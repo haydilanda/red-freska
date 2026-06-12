@@ -162,6 +162,89 @@ def _autor_tier(followers: int) -> str:
     return "usuario-común"
 
 
+def run_tiktok_ads_scraper(api_key: str, max_ads: int = 30) -> List[dict]:
+    """
+    Capa 1 adicional: scraping de TikTok Ads Library / Creative Center.
+    Extrae los anuncios TOP de Food & Beverage en Perú.
+
+    Por qué es valioso: si una marca está pagando por ese contenido,
+    ya validó que funciona. Es señal comercial, no solo cultural.
+
+    Actor: IbRCaDNVKREcwlNJ8 — TikTok Ads Library Scraper (Ad Library + Creative Center)
+    """
+    ADS_ACTOR = "IbRCaDNVKREcwlNJ8"
+
+    payload = {
+        "countryCode": "PE",          # Perú
+        "adLanguage": "es",           # español
+        "industry": "food_beverage",  # Food & Beverage
+        "period": "7",                # últimos 7 días
+        "resultsPerPage": max_ads,
+        "sortBy": "engagement_rate",  # los de mayor engagement primero
+    }
+
+    try:
+        with httpx.Client(timeout=30) as client:
+            run_res = client.post(
+                f"{APIFY_BASE}/acts/{ADS_ACTOR}/runs",
+                headers=_headers(api_key),
+                json=payload,
+            )
+            run_res.raise_for_status()
+            run_id = run_res.json()["data"]["id"]
+
+        print(f"[Apify Ads] Run iniciado: {run_id}")
+        for _ in range(24):  # máx 2 min
+            time.sleep(5)
+            with httpx.Client(timeout=15) as client:
+                status_res = client.get(
+                    f"{APIFY_BASE}/actor-runs/{run_id}",
+                    headers=_headers(api_key),
+                )
+                status = status_res.json()["data"]["status"]
+            print(f"[Apify Ads] Status: {status}")
+            if status == "SUCCEEDED":
+                break
+            if status in ("FAILED", "ABORTED", "TIMED-OUT"):
+                print(f"[Apify Ads] Run falló: {status} — continuando sin ads")
+                return []
+
+        dataset_id = run_res.json()["data"]["defaultDatasetId"]
+        with httpx.Client(timeout=30) as client:
+            data_res = client.get(
+                f"{APIFY_BASE}/datasets/{dataset_id}/items?limit=100",
+                headers=_headers(api_key),
+            )
+            data_res.raise_for_status()
+
+        ads = data_res.json()
+        print(f"[Apify Ads] {len(ads)} anuncios obtenidos de TikTok Ads Library")
+
+        # Normalizar al mismo formato que los videos orgánicos
+        # para que pasen por el mismo pipeline
+        normalizados = []
+        for ad in ads:
+            normalizados.append({
+                "text": ad.get("adText") or ad.get("text") or ad.get("description") or "",
+                "hashtags": ad.get("hashtags") or [],
+                "playCount":    ad.get("videoPlayCount") or ad.get("playCount") or 0,
+                "diggCount":    ad.get("likeCount") or ad.get("diggCount") or 0,
+                "commentCount": ad.get("commentCount") or 0,
+                "shareCount":   ad.get("shareCount") or 0,
+                "createTime":   ad.get("createTime") or ad.get("firstShownDate") or "",
+                "authorMeta":   {"fans": 999_999},  # anunciante = peso alto
+                "musicMeta":    {"musicName": ad.get("musicName") or ""},
+                "_fuente":      "tiktok_ads",       # etiqueta de origen
+                "_advertiser":  ad.get("advertiserName") or ad.get("brand") or "marca",
+            })
+
+        return normalizados
+
+    except Exception as e:
+        print(f"[Apify Ads] Error — continuando solo con scraping orgánico: {e}")
+        return []
+
+
 def run_tiktok_scraper(api_key: str, max_videos: int = 80) -> List[dict]:
     """
     Lanza el scraper de TikTok en Apify y espera el resultado.
@@ -258,9 +341,17 @@ def formatear_para_claude(items: List[dict], top_n: int = 60) -> str:
         sound_name = (music.get("musicName") or music.get("title") or "").strip()
         sound_str  = f' | 🎵 "{sound_name[:60]}"' if sound_name else ""
 
+        # Etiqueta de origen — anuncio pagado vs contenido orgánico
+        fuente = item.get("_fuente", "organico")
+        advertiser = item.get("_advertiser", "")
+        if fuente == "tiktok_ads":
+            origen_str = f" | 💰 ANUNCIO PAGADO ({advertiser})"
+        else:
+            origen_str = " | 🌱 orgánico"
+
         lineas.append(
             f"{i}. [{plays:,} views · {likes:,} likes · {comments:,} cmts · {shares:,} shares]"
-            f" [{fecha_str}] [{tier}]{sound_str}\n"
+            f" [{fecha_str}] [{tier}]{origen_str}{sound_str}\n"
             f"   {desc}\n"
             f"   {hashtags}"
         )

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from supabase import create_client
 from routers.auth import get_current_user
-from services.apify import run_tiktok_scraper, formatear_para_claude
+from services.apify import run_tiktok_scraper, run_tiktok_ads_scraper, formatear_para_claude
+from concurrent.futures import ThreadPoolExecutor
 from services.trend_detector import detectar_tendencias
 from services.scoring import calcular_score
 from routers.scores import score_to_dict
@@ -45,10 +46,20 @@ def _run_deteccion():
         fecha_hoy  = date.today().isoformat()
         sb         = get_supabase()
 
-        # ── Fase 1: Scraping TikTok ───────────────────────────────────────────
+        # ── Fase 1: Scraping TikTok (orgánico + anuncios en paralelo) ─────────
         _estado_deteccion["fase"] = "scraping"
-        print("[Detección] Scraping TikTok via Apify...")
-        items = run_tiktok_scraper(apify_key, max_videos=80)
+        print("[Detección] Scraping TikTok orgánico + Ads Library en paralelo...")
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            fut_organico = executor.submit(run_tiktok_scraper, apify_key, 80)
+            fut_ads      = executor.submit(run_tiktok_ads_scraper, apify_key, 30)
+            items_organico = fut_organico.result()
+            items_ads      = fut_ads.result()
+
+        # Mezclar fuentes — ads tienen peso extra por ser señal validada
+        items = items_organico + items_ads
+        print(f"[Detección] Total combinado: {len(items_organico)} orgánicos + {len(items_ads)} anuncios = {len(items)} videos")
+
         # Pasar top 60 ordenados por engagement a Claude
         contenido = formatear_para_claude(items, top_n=60)
 

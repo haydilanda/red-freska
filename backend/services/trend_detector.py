@@ -36,6 +36,9 @@ SEÑALES DE TENDENCIA REAL (vs ruido):
 - Comentarios altos = generó respuesta emocional → conexión real
 - Múltiples videos independientes sobre el mismo tema = tendencia orgánica
 - Creadores pequeños replicando lo de uno grande = llegó al mainstream
+- 💰 ANUNCIO PAGADO = una marca ya invirtió dinero en esto → señal de que funciona comercialmente
+  Si ves el mismo tema en anuncios pagados Y contenido orgánico → relevancia_food muy alta (4-5)
+  Si solo aparece en anuncios → puede ser tendencia emergente que las marcas detectaron antes que el público
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
