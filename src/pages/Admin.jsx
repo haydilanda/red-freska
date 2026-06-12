@@ -434,13 +434,24 @@ export default function Admin() {
                             </div>
                           </td>
                           <td className="px-4 py-3.5">
-                            <div className="flex items-center justify-center gap-3">
+                            <div className="flex items-center justify-center gap-2">
                               <button
                                 onClick={() => navigate(`/tendencia/${t.id}`)}
                                 className="text-xs text-[#534AB7] hover:underline font-medium"
                               >
                                 Ver detalle
                               </button>
+                              <a
+                                href={`https://www.tiktok.com/search?q=${encodeURIComponent(t.nombre)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Ver en TikTok"
+                                className="p-1.5 rounded-lg text-gray-300 hover:text-black hover:bg-gray-100 transition"
+                              >
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/>
+                                </svg>
+                              </a>
                               <button
                                 onClick={() => setTendenciaAEliminar(t)}
                                 className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition"
