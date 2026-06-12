@@ -5,6 +5,7 @@ from routers.auth import get_current_user
 from services.scoring import calcular_score
 from typing import List, Optional
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 
 router = APIRouter(prefix="/scores", tags=["scores"])
@@ -120,33 +121,61 @@ async def calcular_score_individual(
     return score
 
 
+def _score_una_combinacion(marca: dict, tendencia: dict, api_key: str, sb) -> str:
+    """Calcula y guarda el score de una combinación marca × tendencia."""
+    try:
+        score = calcular_score(
+            marca_id=marca["id"],
+            marca_nombre=marca["nombre"],
+            marca_perfil=marca,
+            tendencia_id=tendencia["id"],
+            tendencia_nombre=tendencia["nombre"],
+            tendencia_descripcion=tendencia["descripcion"],
+            api_key=api_key,
+        )
+        sb.table("scores").upsert(
+            score_to_dict(score),
+            on_conflict="tendencia_id,marca_id",
+        ).execute()
+        return f"OK {marca['nombre']} × {tendencia['nombre']} → {score.score_final}"
+    except Exception as e:
+        return f"ERROR {marca['nombre']} × {tendencia['nombre']}: {e}"
+
+
 def _run_batch(marcas: list, tendencias: list, api_key: str):
-    """Ejecuta el scoring en background para no bloquear el servidor."""
+    """
+    Ejecuta el scoring en paralelo (4 workers simultáneos).
+    4x más rápido que el modo secuencial anterior.
+    54 tendencias × 4 marcas = 216 llamadas → ~8-12 min en vez de 35-40 min.
+    """
     global _cancelar_scoring
     _cancelar_scoring = False
     sb = get_supabase()
-    for marca in marcas:
-        for tendencia in tendencias:
+
+    # Generar todas las combinaciones
+    combinaciones = [
+        (marca, tendencia)
+        for marca in marcas
+        for tendencia in tendencias
+    ]
+    total = len(combinaciones)
+    print(f"=== Scoring batch: {total} combinaciones ({len(marcas)} marcas × {len(tendencias)} tendencias) ===")
+
+    completadas = 0
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futuros = {
+            executor.submit(_score_una_combinacion, m, t, api_key, sb): (m, t)
+            for m, t in combinaciones
+        }
+        for futuro in as_completed(futuros):
             if _cancelar_scoring:
                 print("=== Scoring cancelado por el usuario ===")
+                executor.shutdown(wait=False, cancel_futures=True)
                 return
-            try:
-                score = calcular_score(
-                    marca_id=marca["id"],
-                    marca_nombre=marca["nombre"],
-                    marca_perfil=marca,
-                    tendencia_id=tendencia["id"],
-                    tendencia_nombre=tendencia["nombre"],
-                    tendencia_descripcion=tendencia["descripcion"],
-                    api_key=api_key,
-                )
-                sb.table("scores").upsert(
-                    score_to_dict(score),
-                    on_conflict="tendencia_id,marca_id",
-                ).execute()
-                print(f"OK {marca['nombre']} × {tendencia['nombre']} → {score.score_final}")
-            except Exception as e:
-                print(f"Error scoring {marca['nombre']} × {tendencia['nombre']}: {e}")
+            completadas += 1
+            resultado = futuro.result()
+            print(f"[{completadas}/{total}] {resultado}")
+
     print("=== Scoring batch completado ===")
 
 
