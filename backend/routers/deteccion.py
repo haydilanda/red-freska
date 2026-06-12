@@ -66,6 +66,15 @@ def _run_deteccion():
         if not tendencias:
             raise ValueError("Claude no detectó tendencias en los datos")
 
+        # ── Capa 4: Filtro post-detección ────────────────────────────────────
+        # Solo pasan tendencias con relevancia food >= 3 y no solo "establecidas"
+        antes = len(tendencias)
+        tendencias = [
+            t for t in tendencias
+            if (t.get("relevancia_food") or 0) >= 3
+        ]
+        print(f"[Capa 4] {antes} detectadas → {len(tendencias)} pasaron filtro relevancia_food >= 3")
+
         # Verificar cuáles ya existen por nombre exacto
         nombres_detectados = [t["nombre"] for t in tendencias]
         chequeo = sb.table("tendencias").select("id,nombre").in_("nombre", nombres_detectados).execute()
